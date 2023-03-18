@@ -5,13 +5,15 @@ import time
 wordlist = []
 currentlist = []
 num = 0
+idx = []
 n = 0
     
 def shuffleWords():
-    global currentlist, num, n
+    global currentlist, idx, num, n
     random.shuffle(currentlist)
     n = len(currentlist)
     num = 0
+    idx = random.sample(range(0,n),n)
 
 def initWordlist():
     global wordlist
@@ -111,8 +113,8 @@ def showWordlist():
 
     while True:
         global num
-        print("当前单词: " + currentlist[num][0][0])
-        if wordlist[currentlist[num][1]][4] == "*":
+        print("当前单词: " + currentlist[idx[num]][0][0])
+        if wordlist[currentlist[idx[num]][1]][4] == "*":
             print("当前单词已收藏")
         else:
             print("当前单词未收藏")
@@ -124,11 +126,11 @@ def showWordlist():
             if opt == 0:
                 continue
             elif opt == 1:
-                print(currentlist[num][0][1])
+                print(currentlist[idx[num]][0][1])
             elif opt == 2:
-                print(currentlist[num][0][2])
+                print(currentlist[idx[num]][0][2])
             elif opt == 3:
-                print(currentlist[num][0][3])
+                print(currentlist[idx[num]][0][3])
             elif opt == 4: 
                 if num != 0:
                     num -= 1
@@ -142,25 +144,26 @@ def showWordlist():
                 else:
                     print("已经是最后一个单词！")
             elif opt == 6:
-                wordlist[currentlist[num][1]][4] = "*"
+                wordlist[currentlist[idx[num]][1]][4] = "*"
                 print("收藏成功！")
             elif opt == 7:
-                wordlist[currentlist[num][1]][4] = ""
+                wordlist[currentlist[idx[num]][1]][4] = ""
                 print("取消收藏成功！")
             elif opt == 8:
                 return
 
 def checklecon():
     while True:
-        print("请输入查询第几课，支持第1-30课, 或者输入-1来返回")
+        print("请输入查询第几课，支持第11-22课, 或者输入-1来返回")
         inputstr = input()
         if inputstr == "-1":
             return False
-        lecon_idx = getnumber(inputstr, 1, 30)
+        lecon_idx = getnumber(inputstr, 11, 22)
         if lecon_idx == 0:
             continue
         else:
-            return lecon_idx
+            generateWordlist("Leçon " + str(lecon_idx))
+            return True 
 
 if __name__ == "__main__":
     print("Assistante de Vocabularie Français")
@@ -182,14 +185,10 @@ if __name__ == "__main__":
         elif opt == 3:
             generateWordlist("collections")
         elif opt == 4:
-            if(lecon_idx := checklecon()):
-                generateWordlist("Leçon " + str(lecon_idx))
-            else:
+            if(not checklecon()):
                 continue
 
         if opt == 5:
-            print("Bye~")
-            time.sleep(1)
             exit(0)
         else:
             showWordlist()
