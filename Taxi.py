@@ -4,8 +4,11 @@ import time
 
 wordlist = []
 currentlist = []
+collections = []
 num = 0
 n = 0
+level = ""
+findindex = lambda self, i, value: sorted(self, key = lambda x:x[i] != value)[0]
     
 def shuffleWords():
     global currentlist, num, n
@@ -13,8 +16,8 @@ def shuffleWords():
     n = len(currentlist)
     num = 0
 
-def initWordlist(level):
-    global wordlist
+def initWordlist():
+    global wordlist, level, collections
     csv_file = open("./Taxi! " + level + ".csv", encoding = "UTF-8", newline = "")
     csv_reader = csv.reader(csv_file)
     
@@ -23,33 +26,31 @@ def initWordlist(level):
     for word in csv_reader: 
         wordlist.append(word)
 
+    csv_file.close()
+
+    collections_file = open("Collections.txt", encoding = "UTF-8", newline = "")
+    collections = collections_file.read().split()
+
 def generateWordlist(status):
     global currentlist
 
     currentlist.clear()
 
     if status == "nouns_only":
-        cnt = 0
         for word in wordlist:
             # print(word)
             if(word[1][0:2] == "n."):
-                currentlist.append([word, cnt])
-            cnt += 1
+                currentlist.append(word)
     elif status == "all_words": 
-        cnt = 0
         for word in wordlist:
             # print(word)
             if(word[0] != "" and word[0] != " " and word[0][0:5] != "Leçon" and word[0] != "\ufeff词汇"):
-                currentlist.append([word, cnt])
-            cnt += 1
+                currentlist.append(word)
     elif status == "collections":
-        cnt = 0
-        for word in wordlist:
-            if(word[4] == "*"):
-                currentlist.append([word, cnt])
-            cnt += 1
+        for word in collections:
+            currentlist.append(findindex(wordlist, 0, word))
+            
     elif status[0:5] == "Leçon":
-        cnt = 0
         flag = False
         lecon_idx = int(status[6:])
         for word in wordlist:
@@ -57,23 +58,19 @@ def generateWordlist(status):
                 flag = False
                 break
             if flag:
-                currentlist.append([word, cnt])
+                currentlist.append(word)
             if word[0] == status:
                 flag = True
-            cnt += 1
 
     shuffleWords()
 
-def saveCSV():
-    global wordlist
+def savefile():
+    global collections
 
-    csv_file = open("./Taxi! A1.csv", "w", encoding = "UTF-8", newline = "")
-    csv_writer = csv.writer(csv_file)
-
-    for word in wordlist:
-        csv_writer.writerow(word)
-
-    csv_file.close()
+    collections_file = open("Collections.txt", "w", encoding = "UTF-8", newline = "")
+    for word in collections:
+        collections_file.write(word + "\n")
+    collections_file.close()
 
 def is_number(s):
     try:
@@ -115,8 +112,8 @@ def showWordlist():
 
     while True:
         global num
-        print("当前单词: " + currentlist[num][0][0])
-        if wordlist[currentlist[num][1]][4] == "*":
+        print("当前单词: " + currentlist[num][0])
+        if currentlist[num][0] in collections:
             print("当前单词已收藏")
         else:
             print("当前单词未收藏")
@@ -129,11 +126,11 @@ def showWordlist():
             if opt == 0:
                 continue
             elif opt == 1:
-                print(currentlist[num][0][1])
+                print(currentlist[num][1])
             elif opt == 2:
-                print(currentlist[num][0][2])
+                print(currentlist[num][2])
             elif opt == 3:
-                print(currentlist[num][0][3])
+                print(currentlist[num][3])
             elif opt == 4: 
                 if num != 0:
                     num -= 1
@@ -147,25 +144,35 @@ def showWordlist():
                 else:
                     print("已经是最后一个单词！")
             elif opt == 6:
-                wordlist[currentlist[num][1]][4] = "*"
-                print("收藏成功！")
+                if currentlist[num][0] in collections:
+                    print("已经收藏了该单词！")
+                else:
+                    collections.append(currentlist[num][0])
+                    print("收藏成功！")
             elif opt == 7:
-                wordlist[currentlist[num][1]][4] = ""
-                print("取消收藏成功！")
+                if currentlist[num][0] in collections:
+                    collections.remove(currentlist[num][0])
+                    print("取消收藏成功！")
+                else:
+                    print("暂未收藏该单词！")
             elif opt == 8:
                 return
 
 def checklecon():
     while True:
-        print("请输入查询第几课，支持第1-35课, 或者输入-1来返回")
-        inputstr = input()
-        if inputstr == "-1":
-            return False
-        lecon_idx = getnumber(inputstr, 1, 35)
-        if lecon_idx == 0:
-            continue
-        else:
-            return lecon_idx
+        if level == "A1":
+            print("请输入查询第几课，支持第1-35课, 或者输入-1来返回")
+            inputstr = input()
+            if inputstr == "-1":
+                return False
+            lecon_idx = getnumber(inputstr, 1, 35)
+            if lecon_idx == 0:
+                continue
+            else:
+                return lecon_idx
+        elif level == "A2":
+            print("功能暂未开放，敬请期待！")
+            
 
 def mainPanel():
     while True:
@@ -191,19 +198,23 @@ def mainPanel():
         else:
             showWordlist()
 
-        saveCSV()
+        savefile()
 
 def chooselevel():
+    global level
     while True:
         print("1. A1词汇 2. A2词汇（暂未开放） 3. 退出程序")
         opt = getnumber(input(), 1, 3)
 
         if opt == 1:
-            initWordlist("A1")
+            level = "A1"
+            initWordlist()
             mainPanel()
         elif opt == 2:
-            initWordlist("A2")
-            mainPanel()
+            level = "A2"
+            print("暂未开放，敬请期待！")
+            # initWordlist()
+            # mainPanel()
         elif opt == 3:
             print("Bye~")
             time.sleep(1)
