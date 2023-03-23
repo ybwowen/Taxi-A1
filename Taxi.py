@@ -13,11 +13,13 @@ def shuffleWords():
     n = len(currentlist)
     num = 0
 
-def initWordlist():
+def initWordlist(level):
     global wordlist
-    csv_file = open("./Taxi! A1.csv", encoding = "UTF-8", newline = "")
+    csv_file = open("./Taxi! " + level + ".csv", encoding = "UTF-8", newline = "")
     csv_reader = csv.reader(csv_file)
     
+    wordlist.clear()
+
     for word in csv_reader: 
         wordlist.append(word)
 
@@ -152,25 +154,19 @@ def showWordlist():
 
 def checklecon():
     while True:
-        print("请输入查询第几课，支持第1-30课, 或者输入-1来返回")
+        print("请输入查询第几课，支持第1-35课, 或者输入-1来返回")
         inputstr = input()
         if inputstr == "-1":
             return False
-        lecon_idx = getnumber(inputstr, 1, 30)
+        lecon_idx = getnumber(inputstr, 1, 35)
         if lecon_idx == 0:
             continue
         else:
             return lecon_idx
 
-if __name__ == "__main__":
-    print("Assistante de Vocabularie Français")
-    print("Authored by ybw")
-    time.sleep(1)
-
-    initWordlist()
-
+def mainPanel():
     while True:
-        print("1. 查看所有单词 2. 查看所有名词 3. 查看收藏夹 4. 查询某一课的单词 5. 退出程序")
+        print("1. 查看所有单词 2. 查看所有名词 3. 查看收藏夹 4. 查询某一课的单词 5. 返回")
         opt = getnumber(input(), 1, 5)
         
         if opt == 0:
@@ -188,10 +184,31 @@ if __name__ == "__main__":
                 continue
 
         if opt == 5:
-            print("Bye~")
-            time.sleep(1)
-            exit(0)
+            return
         else:
             showWordlist()
 
         saveCSV()
+
+def chooselevel():
+    while True:
+        print("1. A1词汇 2. A2词汇（暂未开放） 3. 退出程序")
+        opt = getnumber(input(), 1, 3)
+
+        if opt == 1:
+            initWordlist("A1")
+            mainPanel()
+        elif opt == 2:
+            initWordlist("A2")
+            mainPanel()
+        elif opt == 3:
+            print("Bye~")
+            time.sleep(1)
+            exit(0)                
+
+if __name__ == "__main__":
+    print("Assistante de Vocabularie Français")
+    print("Authored by ybw")
+    time.sleep(1)
+
+    chooselevel()
