@@ -111,6 +111,8 @@ def showWordlist():
         time.sleep(1)
         return
 
+    listlen = len(currentlist)
+
     while True:
         global num
         print("当前单词: " + currentlist[num][0][0])
@@ -118,6 +120,7 @@ def showWordlist():
             print("当前单词已收藏")
         else:
             print("当前单词未收藏")
+        print("当前进度：" + str(num + 1) + "/" + str(listlen)) 
         print("1. 显示词性 2. 显示词义/用法 3. 显示变位/特殊阴阳性 4. 上一个单词 5. 下一个单词 6. 收藏单词 7. 取消收藏单词 8. 返回")
 
         while True:
